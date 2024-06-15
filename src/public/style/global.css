@@ -1,0 +1,55 @@
+:root {
+    --jiggle-scale: 0.9;
+}
+
+.toastjs-container {
+    transition-duration: 500ms;
+}
+
+.toastjs {
+    background-color: #0f0f0f;
+    font-size: 12px;
+
+    border: 1px solid #1b1b1b;
+}
+
+.toastjs-btn {
+    margin-top: 10px;
+    font-size: 10px;
+    background-color: rgba(255,255,255,0.05);
+    font-family: inherit;
+}
+
+.shake {
+    animation: shake 1s 1;
+}
+
+@keyframes shake {
+    0%,
+    25%,
+    75%,
+    100% {
+        transform: rotate(0deg) scale(var(--jiggle-scale));
+    }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    35% {
+        transform: rotate(5deg) translateX(5px) scale(var(--jiggle-scale));
+    }
+
+    45% {
+        transform: rotate(-5deg) translateX(-5px) scale(var(--jiggle-scale));
+    }
+
+    55% {
+        transform: rotate(5deg) translateX(5px) scale(var(--jiggle-scale));
+    }
+
+    65% {
+        transform: rotate(-5deg) translateX(-5px) scale(var(--jiggle-scale));
+    }
+}
