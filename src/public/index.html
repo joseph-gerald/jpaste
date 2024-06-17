@@ -21,7 +21,7 @@
 
 <body class="font-body text-[#dcdcdc] bg-[#0a0a0a] min-h-screen">
     <div id="main" class="container mx-auto min-h-screen flex flex-col items-center justify-center">
-        <div class="w-full max-w-[730px] px-5">
+        <div id="container" class="w-full max-w-[730px] px-5">
             <h1>jPaste</h1>
             <small><b>simple</b> and <b>intuitive</b> pastebin</small>
 
@@ -79,6 +79,7 @@
 </body>
 <script>
     const main = document.getElementById("main");
+    const container = document.getElementById("container");
 
     const supportedSyntax = ["angular-html", "angular-ts", "astro", "blade", "c", "coffee", "coffeescript", "cpp", "c++", "css", "glsl", "graphql", "gql", "haml", "handlebars", "hbs", "html", "html-derivative", "http", "imba", "java", "javascript", "js", "jinja", "jison", "json", "json5", "jsonc", "jsonl", "jsx", "julia", "jl", "less", "lua", "markdown", "md", "marko", "mdc", "mdx", "php", "postcss", "pug", "jade", "python", "py", "r", "ruby", "rb", "sass", "scss", "shellscript", "bash", "sql", "stylus", "styl", "svelte", "toml", "tsx", "typescript", "ts", "vue", "vue-html", "wasm", "wgsl", "xml", "yaml", "yml"];
     const content = document.getElementById("content");
@@ -146,27 +147,20 @@
             return;
         }
 
-        await fetch("/api/v1/paste", {
+        const res = await fetch("/api/v1/paste", {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(data)
-        }).then(res => res.json()).then(res => {
-            if (res.success) {
-                new Toast({
-                    message: 'Paste successful!',
-                    type: 'success'
-                });
-
-                window.location.href = `/paste/${res.id}`;
-            } else {
-                new Toast({
-                    message: 'Failed to paste!',
-                    type: 'danger'
-                });
-            }
         });
+
+        const code = await (res.json().then(res => res.code));
+
+        container.innerHTML = `
+            <h1>Success!</h1>
+            <a class="hover:underline" href="${location.href + code}"><small>${location.href}<b>${code}</b></small></a>
+        `;
     });
 
 </script>
