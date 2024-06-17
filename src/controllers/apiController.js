@@ -42,7 +42,9 @@ exports.createPaste = async (req, res) => {
 
     await paste.save();
 
-    res.status(200).send("user created");
+    res.status(200).send({
+        code
+    });
 }
 
 exports.viewPaste = async (req, res) => {
@@ -53,9 +55,8 @@ exports.viewPaste = async (req, res) => {
     if (!paste) return res.sendFile(path.join(__dirname, '..', 'public', 'error/paste', '404.html'));
     
     if (paste.max_reads != -1) {
-        if (paste.reads >= paste.max_reads) return res.status(403).send("max reads reached");
+        if (paste.reads >= paste.max_reads) return res.status(410).sendFile(path.join(__dirname, '..', 'public', 'error/paste', '410.html'));
     }
-    
 
     const html = fs.readFileSync(path.join(__dirname, '..', 'public', 'paste', 'view.html'), 'utf8');
 
@@ -64,7 +65,8 @@ exports.viewPaste = async (req, res) => {
     const data = protected ? {
         max_reads: paste.max_reads,
         reads: paste.reads,
-        protected
+        protected,
+        password: paste.read_key != null
     } : {
         title: paste.title,
         author: paste.author,
@@ -85,7 +87,14 @@ exports.viewProtectedPaste = async (req, res) => {
     const paste = await Paste.findOne({ code });
 
     if (!paste) return res.status(404).send({error: "paste not found"});
-    if (paste.read_key != key) return res.status(403).send({error: "invalid key"});
+    if (paste.read_key && paste.read_key != key) return res.status(403).send({error: "invalid key"});
+
+    if (paste.max_reads != -1) {
+        if (paste.reads >= paste.max_reads) return res.status(403).send({error: "max reads reached"});
+    }
+
+    paste.reads += 1;
+    await paste.save();
 
     return res.status(200).send({
         title: paste.title,

@@ -44,7 +44,7 @@
             </small>
 
             <div class="w-full max-w-[250px] flex flex-col gap-1">
-                <input id="burn-view-key" type="text" placeholder="your_view_key"
+                <input id="burn-view-key" type="password" placeholder="your_view_key"
                     class="border border-[#1b1b1b] bg-[#0f0f0f] p-2 rounded-md outline-none text-sm" />
 
                 <button id="view-button"
@@ -80,6 +80,10 @@
 
         if (reads_left == -1) {
             burnWarning.classList.add("hidden");
+        }
+
+        if (!data.password) {
+            burnViewKey.classList.add("hidden");
         }
 
         if (data.protected) {
