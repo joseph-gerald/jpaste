@@ -11,8 +11,10 @@ router.get('/robots.min.txt', apiController.getRobotsMinified);
 router.post('/api/v1/query', apiController.query);
 router.post('/api/v1/ping', apiController.ping);
 
-// 503
-router.get('/', apiController.getIndex);
+// paste logic
+router.put('/api/v1/paste', apiController.createPaste);
+router.post('/:code', apiController.viewProtectedPaste);
+router.get('/:code', apiController.viewPaste);
 
 router.use((req, res, next) => {
     if (req.method === 'GET') {

@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Sometype Mono:wght@400;500,600,700,800&amp;display=swap" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="tailwind.config.js"></script>
+
+    <script src="/lib/toast.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ireade/Toast.js@master/dist/css/Toast.min.css" />
+
+    <link rel="stylesheet" href="style/global.css" />
+
+    <title>jPaste</title>
+</head>
+
+<body class="font-body text-[#dcdcdc] bg-[#0a0a0a] min-h-screen">
+    <div id="main" class="container mx-auto min-h-screen flex flex-col items-center justify-center">
+        <div class="w-full max-w-[730px] px-5">
+            <h1 id="title">Untitled</h1>
+            <small>By <b id="author">Anonymous</b></small>
+
+            <div class="mt-5 flex flex-col gap-4 w-full">
+                <textarea
+                    class="border border-[#1b1b1b] bg-[#0f0f0f] rounded-md outline-none p-4 text-xs resize-none w-full max-w-screen"
+                    id="content" rows="16"
+                    placeholder="1. The Industrial Revolution and its consequences have been a disaster for the human race. The rest of your manifesto..."
+                    readonly></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div id="pre"
+        class="absolute top-0 left-0 w-screen h-screen bg-[#0a0a0a] flex flex-col justify-center items-center hidden duration-200">
+        <div id="pre-main" class="flex flex-col justify-center items-center m-5">
+            <small id="burn-warning" class="mb-8 opacity-90 text-center">
+                This paste can only be viewed
+                <b id="burn-counter">2</b> more times
+            </small>
+
+            <div class="w-full max-w-[250px] flex flex-col gap-1">
+                <input id="burn-view-key" type="text" placeholder="your_view_key"
+                    class="border border-[#1b1b1b] bg-[#0f0f0f] p-2 rounded-md outline-none text-sm" />
+
+                <button id="view-button"
+                    class="border border-[#1b1b1b] bg-[#0f0f0f] hover:bg-[#1b1b1b] active:opacity-75 text-[#dcdcdc] px-4 py-2 rounded-md mt-2 text-sm">
+                    View
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+    const title = document.getElementById("title");
+    const author = document.getElementById("author");
+    const content = document.getElementById("content");
+
+    const burnWarning = document.getElementById("burn-warning");
+    const burnCounter = document.getElementById("burn-counter");
+    const burnViewKey = document.getElementById("burn-view-key");
+
+    const viewButton = document.getElementById("view-button");
+
+    const preMain = document.getElementById("pre-main");
+    const pre = document.getElementById("pre");
+
+    let data = %data%;
+
+    function loadData() {
+        const reads_left = data.max_reads - data.reads;
+        title.innerText = data.title;
+        author.innerText = data.author;
+        content.innerText = data.content;
+
+        if (reads_left == -1) {
+            burnWarning.classList.add("hidden");
+        }
+
+        if (data.protected) {
+            pre.classList.remove("hidden");
+            burnWarning.innerText = `This paste can only be viewed ${reads_left} more time${reads_left > 1 ? "s" : ""}`;
+            burnCounter.innerText = data.reads;
+
+            viewButton.addEventListener("click", () => {
+                useKey(burnViewKey.value);
+            });
+        } else {
+            content.removeAttribute("readonly");
+        }
+    }
+
+    async function useKey(key) {
+        const res = await fetch(location.pathname, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ key })
+        });
+
+        if (res.ok) {
+            data = await res.json();
+            pre.classList.add("opacity-0");
+            loadData();
+        } else {
+            new Toast({
+                message: 'Invalid Key',
+                type: 'danger'
+            });
+
+            preMain.classList.toggle("shake")
+
+            setTimeout(() => {
+                preMain.classList.toggle("shake")
+            }, 1000);
+        }
+    }
+
+    loadData();
+</script>
+
+</html>

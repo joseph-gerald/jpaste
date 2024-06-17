@@ -11,7 +11,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="tailwind.config.js"></script>
 
-    <script src="lib/toast.js"></script>
+    <script src="/lib/toast.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ireade/Toast.js@master/dist/css/Toast.min.css">
 
     <link rel="stylesheet" href="style/global.css">
@@ -64,12 +64,12 @@
                         <b>Syntax Highlighting</b>
                         <select id="syntax" id="syntax"
                             class="border border-[#1b1b1b] bg-[#0f0f0f] p-2 rounded-md h-[38px]">
-                            <option value="">None</option>
+                            <option value="none">None</option>
                         </select>
                     </div>
                     <div class="flex flex-col gap-2">
                         <b>Reads Before Burn</b>
-                        <input id="max_reads" type="number"
+                        <input id="max_reads" type="number" min="-1"
                             class="border border-[#1b1b1b] bg-[#0f0f0f] p-2 rounded-md outline-none" value="-1">
                     </div>
                 </div>
@@ -105,17 +105,17 @@
         options.classList.toggle(`max-h-[${options.scrollHeight}px]`);
     });
 
-    paste.addEventListener("click", () => {
+    paste.addEventListener("click", async () => {
         if (main.classList.contains("shake")) return;
 
         const data = {
             content: content.value,
-            title: document.getElementById("title").value,
-            author: document.getElementById("author").value,
+            title: document.getElementById("title").value || "Untitled",
+            author: document.getElementById("author").value || "Anonymous",
             read_key: document.getElementById("read_password").value,
             edit_key: document.getElementById("edit_password").value,
             syntax: syntax.value,
-            max_reads: document.getElementById("max_reads").value
+            max_reads: parseInt(document.getElementById("max_reads").value)
         };
 
         if (data.content === "") {
@@ -136,6 +136,37 @@
         for (const key in data) {
             if (data[key] === "") data[key] = null;
         }
+
+        if (data.max_reads < -1 || data.max_reads == 0) {
+            new Toast({
+                message: 'Invalid option: "reads before burn" <br> Must be -1 or greater than 0!',
+                type: 'danger'
+            });
+
+            return;
+        }
+
+        await fetch("/api/v1/paste", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        }).then(res => res.json()).then(res => {
+            if (res.success) {
+                new Toast({
+                    message: 'Paste successful!',
+                    type: 'success'
+                });
+
+                window.location.href = `/paste/${res.id}`;
+            } else {
+                new Toast({
+                    message: 'Failed to paste!',
+                    type: 'danger'
+                });
+            }
+        });
     });
 
 </script>
