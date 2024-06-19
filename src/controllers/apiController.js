@@ -77,7 +77,12 @@ exports.viewPaste = async (req, res) => {
         protected
     };
 
-    res.send(html.replaceAll("%data%", JSON.stringify(data)));
+    if (!protected) {
+        paste.reads += 1;
+        paste.save();
+    }
+
+    res.send(html.replaceAll("% data %", JSON.stringify(data)));
 }
 
 exports.viewProtectedPaste = async (req, res) => {

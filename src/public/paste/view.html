@@ -26,11 +26,9 @@
             <small>By <b id="author">Anonymous</b></small>
 
             <div class="mt-5 flex flex-col gap-4 w-full">
-                <textarea
+                <textarea id="content" rows="16"
                     class="border border-[#1b1b1b] bg-[#0f0f0f] rounded-md outline-none p-4 text-xs resize-none w-full max-w-screen"
-                    id="content" rows="16"
-                    placeholder="1. The Industrial Revolution and its consequences have been a disaster for the human race. The rest of your manifesto..."
-                    readonly></textarea>
+                    readonly>Loading your paste...</textarea>
             </div>
         </div>
     </div>
@@ -70,7 +68,7 @@
     const preMain = document.getElementById("pre-main");
     const pre = document.getElementById("pre");
 
-    let data = %data%;
+    let data = % data %;
 
     function loadData() {
         const reads_left = data.max_reads - data.reads;
@@ -94,8 +92,6 @@
             viewButton.addEventListener("click", () => {
                 useKey(burnViewKey.value);
             });
-        } else {
-            content.removeAttribute("readonly");
         }
     }
 
