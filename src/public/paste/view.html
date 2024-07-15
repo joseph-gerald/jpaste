@@ -8,6 +8,7 @@
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Sometype Mono:wght@400;500,600,700,800&amp;display=swap" />
 
+    <script src="https://cdn.jsdelivr.net/gh/jitbit/HtmlSanitizer@master/HtmlSanitizer.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="tailwind.config.js"></script>
 
@@ -72,9 +73,13 @@
 
     function loadData() {
         const reads_left = data.max_reads - data.reads;
+        let sanitizedContent = null;
+
+        if (!data.protected) sanitizedContent = HtmlSanitizer.SanitizeHtml(data.content);
+
         title.innerText = data.title;
         author.innerText = data.author;
-        content.innerText = data.content;
+        content.innerHTML = sanitizedContent;
 
         if (reads_left == -1) {
             burnWarning.classList.add("hidden");
@@ -107,6 +112,11 @@
         if (res.ok) {
             data = await res.json();
             pre.classList.add("opacity-0");
+
+            setTimeout(() => {
+                pre.classList.add("hidden");
+            }, 200);
+
             loadData();
         } else {
             new Toast({
