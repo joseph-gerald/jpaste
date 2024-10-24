@@ -8,9 +8,10 @@
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Sometype Mono:wght@400;500,600,700,800&amp;display=swap" />
 
-    <script src="https://cdn.jsdelivr.net/gh/jitbit/HtmlSanitizer@master/HtmlSanitizer.js"></script>
+    <script async src="https://cdn.jsdelivr.net/gh/jitbit/HtmlSanitizer@master/HtmlSanitizer.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="tailwind.config.js"></script>
+    <script async src="tailwind.config.js"></script>
+    <script type="module" src="/shiki-loader.js"></script>
 
     <script src="/lib/toast.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ireade/Toast.js@master/dist/css/Toast.min.css" />
@@ -27,9 +28,10 @@
             <small>By <b id="author">Anonymous</b></small>
 
             <div class="mt-5 flex flex-col gap-4 w-full">
-                <textarea id="content" rows="16"
-                    class="border border-[#1b1b1b] bg-[#0f0f0f] rounded-md outline-none p-4 text-xs resize-none w-full max-w-screen"
-                    readonly>Loading your paste...</textarea>
+                <div id="content" class="min-h-[290px] border border-[#1b1b1b] bg-[#0f0f0f] rounded-md outline-none p-4 text-xs w-full max-w-screen">
+                    <textarea id="content-text" rows="16" class="bg-[#0f0f0f] outline-none text-xs resize-none w-full max-w-screen"
+                        readonly>Loading your paste...</textarea>
+                </div>
             </div>
         </div>
     </div>
@@ -54,7 +56,6 @@
         </div>
     </div>
 </body>
-
 <script>
     const title = document.getElementById("title");
     const author = document.getElementById("author");
@@ -71,7 +72,7 @@
 
     let data = % data %;
 
-    function loadData() {
+    async function loadData() {
         const reads_left = data.max_reads - data.reads;
         let sanitizedContent = null;
 
@@ -79,7 +80,13 @@
 
         title.innerText = data.title;
         author.innerText = data.author;
-        content.innerHTML = sanitizedContent;
+        // content.innerHTML = sanitizedContent;
+        
+        content.tagName = "div";
+        content.innerHTML = await codeToHtml(sanitizedContent, {
+            lang: data.syntax,
+            theme: "vitesse-dark",
+        });
 
         if (reads_left == -1) {
             burnWarning.classList.add("hidden");
@@ -132,7 +139,18 @@
         }
     }
 
-    loadData();
+    async function init() {
+        while (true) {
+            if (!window.codeToHtml) {
+                await new Promise((resolve) => setTimeout(resolve, 100));    
+                continue;    
+            }
+            loadData();
+            break;
+        }
+    }
+
+    init();
 </script>
 
 </html>
