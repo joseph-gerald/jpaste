@@ -16,7 +16,7 @@
 .toastjs-btn {
     margin-top: 10px;
     font-size: 10px;
-    background-color: rgba(255,255,255,0.05);
+    background-color: rgba(255, 255, 255, 0.05);
     font-family: inherit;
 }
 
@@ -25,6 +25,7 @@
 }
 
 @keyframes shake {
+
     0%,
     25%,
     75%,
@@ -52,4 +53,72 @@
     65% {
         transform: rotate(-5deg) translateX(-5px) scale(var(--jiggle-scale));
     }
+}
+
+.view {
+    #content>* {
+        white-space: pre;
+    }
+
+    #content {
+        counter-reset: line-number;
+        /* Add padding to the left to make space for the line numbers */
+        padding-left: 3.5em;
+        position: relative;
+        /* Essential for positioning the numbers */
+    }
+
+    #content .line::before {
+        counter-increment: line-number;
+        content: counter(line-number);
+        /* Position the line numbers within the padding area */
+        position: absolute;
+        left: 0;
+        /* Adjust as needed for alignment within the padding */
+        text-align: right;
+        width: 2.5em;
+        /* Adjust width as needed */
+        color: rgba(107, 114, 128, 0.5);
+        /* Example color */
+        user-select: none;
+        /* Prevent selection of line numbers */
+    }
+
+    #content pre::before {
+        counter-increment: line-number;
+        content: counter(line-number);
+        /* Position the line numbers within the padding area */
+        position: absolute;
+        left: 0;
+        /* Adjust as needed for alignment within the padding */
+        text-align: right;
+        width: 2.5em;
+        /* Adjust width as needed */
+        color: rgba(107, 114, 128, 0.5);
+        /* Example color */
+        user-select: none;
+        /* Prevent selection of line numbers */
+    }
+}
+
+::-webkit-scrollbar {
+  width: 8px; /* For vertical scrollbar */
+  height: 10px; /* For horizontal scrollbar */
+}
+
+/* Styling the scrollbar track (the background) */
+::-webkit-scrollbar-track {
+  background: #1b1b1b;
+  border-radius: 5px;
+}
+
+/* Styling the scrollbar thumb (the draggable part) */
+::-webkit-scrollbar-thumb {
+  background: #88888860;
+  border-radius: 5px;
+}
+
+/* Styling the scrollbar thumb on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }

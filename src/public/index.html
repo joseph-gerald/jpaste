@@ -19,58 +19,59 @@
     <title>jPaste</title>
 </head>
 
-<body class="font-body text-[#dcdcdc] bg-[#0a0a0a] min-h-screen">
+<body class="font-body text-text bg-background min-h-screen">
     <div id="main" class="container mx-auto min-h-screen flex flex-col items-center justify-center">
-        <div id="container" class="w-full max-w-[730px] px-5">
-            <h1>jPaste</h1>
-            <small><b>simple</b> and <b>intuitive</b> pastebin</small>
+        <div id="container" class="w-full max-w-[1230px] px-5">
+            <div class="flex items-center gap-2">
+                <h1>jPaste</h1> <span class="opacity-50">/</span> <small class="opacity-85"><b>simple</b> and <b>intuitive</b> pastebin</small>
+            </div>
 
             <div class="mt-5 flex flex-col gap-4 w-full">
                 <textarea
-                    class="border border-[#1b1b1b] bg-[#0f0f0f] rounded-md outline-none p-4 text-xs resize-none w-full max-w-screen"
-                    id="content" rows="16"
+                    class="border border-border bg-highlight rounded-md outline-none p-4 text-xs resize-none w-full max-w-screen"
+                    id="content" rows="36"
                     placeholder="1. The Industrial Revolution and its consequences have been a disaster for the human race. The rest of your manifesto..."></textarea>
 
                 <button
-                    class="border border-[#1b1b1b] bg-[#0f0f0f] hover:bg-[#1b1b1b] active:opacity-75 text-[#dcdcdc] px-4 py-2 rounded-md">Paste</button>
+                    class="border border-border bg-highlight hover:bg-border active:opacity-75 text-text px-4 py-2 rounded-md">Paste</button>
 
                 <button id="options-toggle" class="text-xs hover:font-bold opacity-50">More Options</button>
 
                 <div
-                    class="text-sm grid grid-cols-2 gap-4 overflow-y-clip scale-y-50 max-h-0 -translate-y-1/4 opacity-0 duration-500">
+                    class="text-sm grid lg:grid-cols-2 gap-4 overflow-y-clip scale-y-50 max-h-0 -translate-y-1/4 opacity-0 duration-500">
                     <div class="flex flex-col gap-2">
                         <b>Title</b>
                         <input id="title" placeholder="Untitled" type="text"
-                            class="border border-[#1b1b1b] bg-[#0f0f0f] p-2 rounded-md outline-none">
+                            class="border border-border bg-highlight p-2 rounded-md outline-none">
                     </div>
                     <div class="flex flex-col gap-2">
                         <b>Signed Name</b>
                         <input id="author" placeholder="Anonymous" type="text"
-                            class="border border-[#1b1b1b] bg-[#0f0f0f] p-2 rounded-md outline-none">
+                            class="border border-border bg-highlight p-2 rounded-md outline-none">
                     </div>
 
                     <div class="flex flex-col gap-2">
                         <b>Access Password</b>
                         <input id="read_password" placeholder="blank = anyone with link can open" type="password"
-                            class="border border-[#1b1b1b] bg-[#0f0f0f] p-2 rounded-md outline-none">
+                            class="border border-border bg-highlight p-2 rounded-md outline-none">
                     </div>
                     <div class="flex flex-col gap-2">
                         <b>Edit Password</b>
                         <input id="edit_password" placeholder="blank = no way to edit or delete" type="password"
-                            class="border border-[#1b1b1b] bg-[#0f0f0f] p-2 rounded-md outline-none">
+                            class="border border-border bg-highlight p-2 rounded-md outline-none">
                     </div>
 
                     <div class="flex flex-col gap-2">
                         <b>Syntax Highlighting</b>
                         <select id="syntax" id="syntax"
-                            class="border border-[#1b1b1b] bg-[#0f0f0f] p-2 rounded-md h-[38px]">
+                            class="border border-border bg-highlight p-2 rounded-md h-[38px] outline-none">
                             <option value="none">None</option>
                         </select>
                     </div>
                     <div class="flex flex-col gap-2">
                         <b>Reads Before Burn</b>
                         <input id="max_reads" type="number" min="-1"
-                            class="border border-[#1b1b1b] bg-[#0f0f0f] p-2 rounded-md outline-none" value="-1">
+                            class="border border-border bg-highlight p-2 rounded-md outline-none" value="-1">
                     </div>
                 </div>
             </div>

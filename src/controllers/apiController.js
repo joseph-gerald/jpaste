@@ -61,20 +61,23 @@ exports.viewPaste = async (req, res) => {
     const html = fs.readFileSync(path.join(__dirname, '..', 'public', 'paste', 'view.html'), 'utf8');
 
     const protected = paste.read_key != null || paste.max_reads != -1;
+    const mutable   = paste.edit_key != null;
 
     const data = protected ? {
         max_reads: paste.max_reads,
         reads: paste.reads,
         protected,
-        password: paste.read_key != null
+        mutable,
+        password: paste.read_key != null,
     } : {
         title: paste.title,
         author: paste.author,
-        content: paste.content,
+        content: encodeURI(paste.content),
         syntax: paste.syntax,
         max_reads: paste.max_reads,
         reads: paste.reads,
-        protected
+        protected,
+        mutable,
     };
 
     if (!protected) {
@@ -98,16 +101,18 @@ exports.viewProtectedPaste = async (req, res) => {
         if (paste.reads >= paste.max_reads) return res.status(403).send({error: "max reads reached"});
     }
 
+    const mutable = paste.edit_key != null;
     paste.reads += 1;
     await paste.save();
 
     return res.status(200).send({
         title: paste.title,
         author: paste.author,
-        content: paste.content,
+        content: encodeURI(paste.content),
         syntax: paste.syntax,
         max_reads: paste.max_reads,
-        reads: paste.reads
+        reads: paste.reads,
+        mutable
     });
 }
 

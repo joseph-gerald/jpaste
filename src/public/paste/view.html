@@ -8,10 +8,8 @@
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Sometype Mono:wght@400;500,600,700,800&amp;display=swap" />
 
-    <script async src="https://cdn.jsdelivr.net/gh/jitbit/HtmlSanitizer@master/HtmlSanitizer.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script async src="tailwind.config.js"></script>
-    <script type="module" src="/shiki-loader.js"></script>
 
     <script src="/lib/toast.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ireade/Toast.js@master/dist/css/Toast.min.css" />
@@ -21,37 +19,82 @@
     <title>jPaste</title>
 </head>
 
-<body class="font-body text-[#dcdcdc] bg-[#0a0a0a] min-h-screen">
-    <div id="main" class="container mx-auto min-h-screen flex flex-col items-center justify-center">
-        <div class="w-full max-w-[730px] px-5">
-            <h1 id="title">Untitled</h1>
-            <small>By <b id="author">Anonymous</b></small>
+<body class="font-body text-text bg-background min-h-screen view overflow-hidden">
+    <div id="main" class="mx-auto min-h-screen flex flex-col items-center justify-center max-sm:py-5">
+        <div class="w-full max-w-full">
+            <div class="flex justify-between items-center p-4">
+                <div>
+                    <h1 id="title">Untitled</h1>
+                    <small>By <b id="author">Anonymous</b></small>
+                </div>
 
-            <div class="mt-5 flex flex-col gap-4 w-full">
-                <div id="content" class="min-h-[290px] border border-[#1b1b1b] bg-[#0f0f0f] rounded-md outline-none p-4 text-xs w-full max-w-screen">
-                    <textarea id="content-text" rows="16" class="bg-[#0f0f0f] outline-none text-xs resize-none w-full max-w-screen"
-                        readonly>Loading your paste...</textarea>
+                <div class="flex gap-2">
+                    <button id="copy-to-clipboard"
+                        class="bg-highlight border border-border size-10 rounded-md flex items-center justify-center hover:bg-border active:opacity-75">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-copy-icon lucide-copy">
+                            <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                            <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                        </svg>
+                    </button>
+                    <button id="edit"
+                        class="bg-highlight border border-border size-10 rounded-md flex items-center justify-center hover:bg-border active:opacity-75">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-pencil-icon lucide-pencil">
+                            <path
+                                d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+                            <path d="m15 5 4 4" />
+                        </svg>
+                    </button>
+                    <button id="delete"
+                        class="bg-highlight border border-border size-10 rounded-md flex items-center justify-center hover:bg-border active:opacity-75">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-trash-icon lucide-trash">
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+                            <path d="M3 6h18" />
+                            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+
+            <div class="flex flex-col gap-4 w-full">
+                <div id="content"
+                    class="h-[calc(100vh-80px)] border border-border bg-highlight rounded-md outline-none p-4 text-xs w-full max-w-screen overflow-auto no-scrollbar">
+                    <pre id="content-text" rows="16"
+                        class="bg-highlight outline-none text-xs resize-none w-full max-w-screen"
+                        readonly>Loading your paste...</pre>
                 </div>
             </div>
         </div>
     </div>
 
     <div id="pre"
-        class="absolute top-0 left-0 w-screen h-screen bg-[#0a0a0a] flex flex-col justify-center items-center hidden duration-200">
+        class="absolute top-0 left-0 w-screen h-screen bg-background flex flex-col justify-center items-center hidden duration-200">
         <div id="pre-main" class="flex flex-col justify-center items-center m-5">
-            <small id="burn-warning" class="mb-8 opacity-90 text-center">
+            <small id="burn-warning" class="mb-4 opacity-90 text-center">
                 This paste can only be viewed
                 <b id="burn-counter">2</b> more times
             </small>
 
-            <div class="w-full max-w-[250px] flex flex-col gap-1">
-                <input id="burn-view-key" type="password" placeholder="your_view_key"
-                    class="border border-[#1b1b1b] bg-[#0f0f0f] p-2 rounded-md outline-none text-sm" />
+            <div class="w-full min-w-[350px] flex flex-col gap-1">
+                <input id="burn-view-key" type="password" placeholder="Action Password"
+                    class="border border-border bg-highlight p-2 rounded-md outline-none text-sm w-full" />
 
-                <button id="view-button"
-                    class="border border-[#1b1b1b] bg-[#0f0f0f] hover:bg-[#1b1b1b] active:opacity-75 text-[#dcdcdc] px-4 py-2 rounded-md mt-2 text-sm">
-                    View
-                </button>
+                <div class="flex gap-2 w-full">
+                    <button id="view-button"
+                        class="border border-border bg-highlight hover:bg-border active:opacity-75 text-text px-4 py-2 rounded-md mt-2 text-sm w-full">
+                        View
+                    </button>
+                    <a href="/"
+                        class="border border-border bg-highlight hover:bg-border active:opacity-75 text-text px-4 py-2 rounded-md mt-2 text-sm w-full text-center">
+                        Cancel
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -65,46 +108,79 @@
     const burnCounter = document.getElementById("burn-counter");
     const burnViewKey = document.getElementById("burn-view-key");
 
+    const copyToClipboard = document.getElementById("copy-to-clipboard");
+    const deleteButton = document.getElementById("delete");
+    const editButton = document.getElementById("edit-button");
+
     const viewButton = document.getElementById("view-button");
 
     const preMain = document.getElementById("pre-main");
     const pre = document.getElementById("pre");
 
     let data = % data %;
+    let first = true;
 
     async function loadData() {
         const reads_left = data.max_reads - data.reads;
-        let sanitizedContent = null;
 
-        if (!data.protected) sanitizedContent = HtmlSanitizer.SanitizeHtml(data.content);
+        data.content = decodeURI(data.content);
 
         title.innerText = data.title;
         author.innerText = data.author;
-        // content.innerHTML = sanitizedContent;
-        
-        content.tagName = "div";
-        content.innerHTML = await codeToHtml(sanitizedContent, {
-            lang: data.syntax,
-            theme: "vitesse-dark",
-        });
 
-        if (reads_left == -1) {
+        content.children[0].innerText = data.content;
+
+        for (let i = 0; i < content.children[0].innerText.split("\n").length; i++) {
+            const line = document.createElement("pre");
+            line.classList.add("line", "whitespace-pre", "text-[#FFFFFF60]");
+
+            line.innerText = content.children[0].innerText.split("\n")[i];
+
+            if (line.innerText == "") line.innerText = " ";
+            content.appendChild(line);
+        }
+
+        content.children[0].innerText = "";
+
+        if (!data.protected) {
+            copyToClipboard.onclick = () => {
+                navigator.clipboard.writeText(data.content).then(() => {
+                    new Toast({
+                        message: 'Copied to clipboard!',
+                        type: 'success'
+                    });
+                });
+            };
+
+            content.children[0].classList.add("animate-pulse", "opacity-25")
+            while (!window.replaceContent) await new Promise(resolve => setTimeout(resolve, 25));
+            window.replaceContent(data.language, data.content);
+        }
+
+        if (reads_left == -1 && first) {
             burnWarning.classList.add("hidden");
         }
 
-        if (!data.password) {
+        if (!data.password && first) {
             burnViewKey.classList.add("hidden");
         }
 
         if (data.protected) {
             pre.classList.remove("hidden");
-            burnWarning.innerText = `This paste can only be viewed ${reads_left} more time${reads_left > 1 ? "s" : ""}`;
+
+            if (first) {
+                if (data.max_reads > 0) burnWarning.innerText = `This paste can only be viewed ${reads_left} more time${reads_left > 1 ? "s" : ""}`;
+                else burnWarning.classList.add("hidden");
+            }
+
             burnCounter.innerText = data.reads;
 
             viewButton.addEventListener("click", () => {
                 useKey(burnViewKey.value);
             });
         }
+
+        first = false;
     }
 
     async function useKey(key) {
@@ -118,11 +194,17 @@
 
         if (res.ok) {
             data = await res.json();
-            pre.classList.add("opacity-0");
 
-            setTimeout(() => {
+            pre.animate([
+                { opacity: 1 },
+                { opacity: 1, background: "transparent", filter: "blur(10px)", transform: "scale(1.05)" },
+                { opacity: 0, background: "transparent", filter: "blur(15px)", transform: "scale(1)" }
+            ], {
+                duration: 750,
+                easing: "ease-in-out"
+            }).onfinish = () => {
                 pre.classList.add("hidden");
-            }, 200);
+            };
 
             loadData();
         } else {
@@ -141,16 +223,30 @@
 
     async function init() {
         while (true) {
-            if (!window.codeToHtml) {
-                await new Promise((resolve) => setTimeout(resolve, 100));    
-                continue;    
-            }
             loadData();
             break;
         }
     }
 
     init();
+</script>
+<script type="module">
+    import { codeToHtml } from 'https://esm.sh/shiki@3.0.0';
+
+    window.replaceContent = async function (lang, raw) {
+        const content = document.getElementById("content");
+
+        content.innerHTML = await codeToHtml(raw, {
+            lang: 'js',
+            theme: 'github-dark',
+            showLineNumbers: true,
+            colorReplacements: {
+                '#24292e': '#0f0f0f'
+            }
+        });
+
+        content.classList.add("pl-0");
+    }
 </script>
 
 </html>
