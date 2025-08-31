@@ -48,7 +48,7 @@ exports.createPaste = async (req, res) => {
 }
 
 exports.viewPaste = async (req, res) => {
-    const code = req.params.code;
+    const code = req.params.code.toUpperCase();
 
     const paste = await Paste.findOne({ code });
 
@@ -86,10 +86,10 @@ exports.viewPaste = async (req, res) => {
     }
 
     res.send(html.replaceAll("% data %", JSON.stringify(data)));
-}
+};
 
 exports.viewProtectedPaste = async (req, res) => {
-    const code = req.params.code;
+    const code = req.params.code.toUpperCase();
     const key = req.body.key;
 
     const paste = await Paste.findOne({ code });
@@ -114,7 +114,37 @@ exports.viewProtectedPaste = async (req, res) => {
         reads: paste.reads,
         mutable
     });
-}
+};
+
+exports.deletePaste = async (req, res) => {
+    const code = req.params.code;
+    const key = req.body.key;
+
+    const paste = await Paste.findOne({ code });
+
+    if (!paste.edit_key || paste.edit_key != key) return res.sendStatus(401);
+    if (!paste) return res.sendStatus(404);
+
+    await paste.deleteOne();
+
+    res.sendStatus(204);
+};
+
+exports.editPaste = async (req, res) => {
+    const code = req.params.code.toUpperCase();
+    const key = req.body.key;
+    const newContent = req.body.content;
+
+    const paste = await Paste.findOne({ code });
+
+    if (!paste) return res.sendStatus(404);
+    if (!paste.edit_key || paste.edit_key != key) return res.sendStatus(401);
+
+    paste.content = newContent;
+    await paste.save();
+
+    res.sendStatus(204);
+};
 
 exports.ping = (req, res) => {
     res.send('pong');

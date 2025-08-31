@@ -20,7 +20,7 @@
 </head>
 
 <body class="font-body text-text bg-background min-h-screen view overflow-hidden">
-    <div id="main" class="mx-auto min-h-screen flex flex-col items-center justify-center max-sm:py-5">
+    <div id="main" class="mx-auto min-h-screen flex flex-col items-center justify-center">
         <div class="w-full max-w-full">
             <div class="flex justify-between items-center p-4">
                 <div>
@@ -39,7 +39,7 @@
                         </svg>
                     </button>
                     <button id="edit"
-                        class="bg-highlight border border-border size-10 rounded-md flex items-center justify-center hover:bg-border active:opacity-75">
+                        class="bg-highlight border border-border size-10 rounded-md flex items-center justify-center hover:bg-border active:opacity-75 disabled:opacity-50 disabled:cursor-not-allowed">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="lucide lucide-pencil-icon lucide-pencil">
@@ -110,7 +110,7 @@
 
     const copyToClipboard = document.getElementById("copy-to-clipboard");
     const deleteButton = document.getElementById("delete");
-    const editButton = document.getElementById("edit-button");
+    const editButton = document.getElementById("edit");
 
     const viewButton = document.getElementById("view-button");
 
@@ -132,7 +132,6 @@
 
         for (let i = 0; i < content.children[0].innerText.split("\n").length; i++) {
             const line = document.createElement("pre");
-            line.classList.add("line", "whitespace-pre", "text-[#FFFFFF60]");
 
             line.innerText = content.children[0].innerText.split("\n")[i];
 
@@ -141,6 +140,52 @@
         }
 
         content.children[0].innerText = "";
+
+        deleteButton.classList.toggle("hidden", !data.mutable);
+        editButton.classList.toggle("hidden", !data.mutable);
+
+        deleteButton.onclick = () => {
+            const editPassword = prompt("Enter edit password");
+
+            fetch(location.pathname, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ key: editPassword })
+            }).then(res => {
+                if (res.ok) {
+                    window.location.href = "/";
+                } else {
+                    new Toast({
+                        message: 'Failed to delete paste',
+                        type: 'danger'
+                    });
+                }
+            });
+        };
+
+        editButton.onclick = () => {
+            const newContent = prompt("Enter new content");
+            const editPassword = prompt("Enter edit password");
+
+            fetch(location.pathname, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ key: editPassword, content: newContent })
+            }).then(res => {
+                if (res.ok) {
+                    window.location.reload();
+                } else {
+                    new Toast({
+                        message: 'Failed to edit paste',
+                        type: 'danger'
+                    });
+                }
+            });
+        };
 
         if (!data.protected) {
             copyToClipboard.onclick = () => {
@@ -152,9 +197,11 @@
                 });
             };
 
-            content.children[0].classList.add("animate-pulse", "opacity-25")
-            while (!window.replaceContent) await new Promise(resolve => setTimeout(resolve, 25));
-            window.replaceContent(data.language, data.content);
+            if (data.syntax != "none") {
+                content.children[0].classList.add("animate-pulse", "opacity-25")
+                while (!window.replaceContent) await new Promise(resolve => setTimeout(resolve, 25));
+                window.replaceContent(data.syntax, data.content);
+            }
         }
 
         if (reads_left == -1 && first) {
@@ -200,7 +247,7 @@
                 { opacity: 1, background: "transparent", filter: "blur(10px)", transform: "scale(1.05)" },
                 { opacity: 0, background: "transparent", filter: "blur(15px)", transform: "scale(1)" }
             ], {
-                duration: 750,
+                duration: 200,
                 easing: "ease-in-out"
             }).onfinish = () => {
                 pre.classList.add("hidden");
@@ -237,7 +284,7 @@
         const content = document.getElementById("content");
 
         content.innerHTML = await codeToHtml(raw, {
-            lang: 'js',
+            lang: lang,
             theme: 'github-dark',
             showLineNumbers: true,
             colorReplacements: {

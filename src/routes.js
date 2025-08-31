@@ -12,8 +12,11 @@ router.post('/api/v1/ping', apiController.ping);
 
 // paste logic
 router.put('/api/v1/paste', apiController.createPaste);
+
+router.delete('/:code', apiController.deletePaste);
 router.post('/:code', apiController.viewProtectedPaste);
 router.get('/:code', apiController.viewPaste);
+router.put('/:code', apiController.editPaste);
 
 router.use((req, res, next) => {
     if (req.method === 'GET') {
