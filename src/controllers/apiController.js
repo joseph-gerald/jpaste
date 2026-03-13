@@ -27,7 +27,7 @@ exports.createPaste = async (req, res) => {
     const code = [...Array(4)].map(i => (Math.floor(10 + Math.random() * 26)).toString(36)).join('').toUpperCase();
 
     // pray that not all 456,976 codes are taken
-    if (await Paste.findOne({ code})) return exports.createPaste(req, res);
+    if (await Paste.findOne({ code })) return exports.createPaste(req, res);
 
     const paste = new Paste({
         code,
@@ -53,15 +53,19 @@ exports.viewPaste = async (req, res) => {
     const paste = await Paste.findOne({ code });
 
     if (!paste) return res.sendFile(path.join(__dirname, '..', 'public', 'error/paste', '404.html'));
-    
+
     if (paste.max_reads != -1) {
         if (paste.reads >= paste.max_reads) return res.status(410).sendFile(path.join(__dirname, '..', 'public', 'error/paste', '410.html'));
+    }
+
+    if (paste.content.length > 100_000) {
+        return res.redirect(`/${code}/raw`);
     }
 
     const html = fs.readFileSync(path.join(__dirname, '..', 'public', 'paste', 'view.html'), 'utf8');
 
     const protected = paste.read_key != null || paste.max_reads != -1;
-    const mutable   = paste.edit_key != null;
+    const mutable = paste.edit_key != null;
 
     const data = protected ? {
         max_reads: paste.max_reads,
@@ -80,12 +84,37 @@ exports.viewPaste = async (req, res) => {
         mutable,
     };
 
-    if (!protected) {
-        paste.reads += 1;
-        paste.save();
-    }
+    paste.reads += 1;
+    paste.save();
 
     res.send(html.replaceAll("% data %", JSON.stringify(data)));
+}
+
+exports.viewPasteRaw = async (req, res) => {
+    const code = req.params.code;
+    const read_key = req.query.readkey;
+
+    const paste = await Paste.findOne({ code });
+
+    if (!paste) return res.sendFile(path.join(__dirname, '..', 'public', 'error/paste', '404.html'));
+
+    if (paste.max_reads != -1) {
+        if (paste.reads >= paste.max_reads) return res.status(410).sendFile(path.join(__dirname, '..', 'public', 'error/paste', '410.html'));
+    }
+
+    const protected = paste.read_key != null || paste.max_reads != -1;
+
+    res.setHeader('Content-Type', 'text/plain');
+
+    if (protected) {
+        if (paste.read_key && paste.read_key != read_key) return res.status(403).send("invalid read key");
+        if (!read_key) return res.status(400).send("read key required (?readkey=KEY)");
+    }
+
+    paste.reads += 1;
+    paste.save();
+
+    res.send(paste.content);
 }
 
 exports.viewProtectedPaste = async (req, res) => {
@@ -94,11 +123,11 @@ exports.viewProtectedPaste = async (req, res) => {
 
     const paste = await Paste.findOne({ code });
 
-    if (!paste) return res.status(404).send({error: "paste not found"});
-    if (paste.read_key && paste.read_key != key) return res.status(403).send({error: "invalid key"});
+    if (!paste) return res.status(404).send({ error: "paste not found" });
+    if (paste.read_key && paste.read_key != key) return res.status(403).send({ error: "invalid key" });
 
     if (paste.max_reads != -1) {
-        if (paste.reads >= paste.max_reads) return res.status(403).send({error: "max reads reached"});
+        if (paste.reads >= paste.max_reads) return res.status(403).send({ error: "max reads reached" });
     }
 
     const mutable = paste.edit_key != null;
